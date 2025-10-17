@@ -24,7 +24,7 @@ namespace DesafioPOO.Models
         protected string Endereco;
         protected int Numero;
         protected bool Alugado;
-        protected Proprietario Proprietario;
+        public Proprietario Proprietario { get; protected set; }
 
         public Imovel(string endereco, int numero, Proprietario proprietario)
         {

@@ -5,10 +5,8 @@ using DesafioPOO.Models;
 
 
 // Desafio POO - Corretora Imobiliária
-
-List<Imovel> imoveis = new List<Imovel>();
-
-   
+List<Imovel> imoveis = new DataBase().LerImoveis(); // Le dados do bando de dados
+ 
 // Menu interativo
 int opcao = -1; // Cria variável inteira, iniciada em -1, para não gerar erro.
 bool verifica = true; // variavel booleana para validar o While
@@ -70,6 +68,7 @@ static void EsperarRetornoMenu()
 
 void CadastrarImovel()
 {
+    // Solicita entrada de dados
     Console.WriteLine("\n1 - Casa\n2 - Apartamento");
     Console.WriteLine("Sua escolha é: ");
     string tipo = Console.ReadLine();
@@ -89,28 +88,47 @@ void CadastrarImovel()
     Console.WriteLine("Digite o CPF do proprietário: ");
     string cpf = Console.ReadLine();
 
-    var proprietario = new Proprietario(nome, telefone, cpf);
-    if (tipo == "1")
-        imoveis.Add(new Casa(endereco, numero, proprietario));
-    else if (tipo == "2")
-        imoveis.Add(new Apartamento(endereco, numero, proprietario));
-    else
-        Console.WriteLine("Tipo inválido");
+    var proprietario = new Proprietario(nome, telefone, cpf); // Aglomera os dados do ao proprietário
 
-    Console.WriteLine("Imóvel cadastrado com sucesso!");
+    Imovel novoImovel = null; // inicia com valor nulo
+    // Direciona qual tipo de imovel
+    if (tipo == "1") 
+    {
+        novoImovel = new Casa(endereco, numero, proprietario);
+    }
+    else if (tipo == "2")
+    {
+        novoImovel = new Apartamento(endereco, numero, proprietario);
+    }
+    else
+    {
+        Console.WriteLine("Tipo inválido!"); // Erro caso não digitar uma das opções apresentadas
+        EsperarRetornoMenu();
+        return;
+    }
+
+    imoveis.Add(novoImovel); // Cria novo imóvel
+
+    // SALVAR NO BANCO
+    var db = new DataBase();
+    db.SalvarImovel(novoImovel);
+
+    Console.WriteLine("Imóvel cadastrado e sincronizado com o banco de dados!"); // Finaliza cadastro
     Console.ReadKey();
 }
 
-void ListarImoveis()
+void ListarImoveis() // Lista os imóveis
 {
     Console.WriteLine("## LISTA DE IMÓVEIS ##");
-    if (imoveis.Count == 0) {
+    if (imoveis.Count == 0)
+    {
         Console.WriteLine("Nenhum imóvel cadastrado.");
         Console.ReadKey(); // espera o usuário antes de voltar ao menu
-        return;            // sai da função
+        return;
     }
-    int i = 1;
-    foreach (var imovel in imoveis) {
+    int i = 1; 
+    foreach (var imovel in imoveis) // Estrutura do imóvel começando por numero 1 ao invés de zero
+    {
         Console.WriteLine($"{i++} - {imovel.GetEndereco()}, Número {imovel.GetNumero()}");
         Console.WriteLine(imovel.EstaAlugado());
         Console.WriteLine(imovel.ContatoProprietario());
@@ -119,56 +137,30 @@ void ListarImoveis()
     Console.ReadKey();
 }
 
-void DeletarImovel()
+void AlterarStatusImovel() // Funçao para ALUGAR ou DISPONIBILIZAR o Imóvel
 {
-    if (imoveis.Count == 0) {
+    if (imoveis.Count == 0) { // verifica se existe imóveis cadastrados - evitar erro no código
         Console.WriteLine("Nenhum imóvel cadastrado.");
         Console.ReadKey(); // espera o usuário
-        return;            // sai da função e volta ao menu
-    }
-    Console.WriteLine("## DELETAR IMÓVEL ##");
-    int i = 1;
-    foreach (var imovel in imoveis) {
-        Console.WriteLine($"{i++} - {imovel.GetEndereco()}, Nº {imovel.GetNumero()}");
-    }
-
-    Console.Write("Digite o número do imóvel que deseja deletar: ");
-    int indice = int.Parse(Console.ReadLine()) - 1;
-
-    if (indice >= 0 && indice < imoveis.Count) {
-        imoveis.RemoveAt(indice);
-        Console.WriteLine("Imóvel removido com sucesso!");
-    }
-    else {
-        Console.WriteLine("Imóvel não encontrado!");
-    }
-    Console.ReadKey();
-}
-
-void AlterarStatusImovel()
-{
-    if (imoveis.Count == 0) {
-        Console.WriteLine("Nenhum imóvel cadastrado.");
-        Console.ReadKey(); // espera o usuário
-        return;            // sai da função e volta ao menu
+        return;           
     }
 
     Console.WriteLine("## ALUGAR / DISPONIBILIZAR IMÓVEL ##");
     int i = 1;
-    foreach (var imovel in imoveis) {
+    foreach (var imovel in imoveis) { // lista os imóveis iniciando por 1
         Console.WriteLine($"{i++} - {imovel.GetEndereco()}, Nº {imovel.GetNumero()} - {imovel.EstaAlugado()}");
     }
 
-    Console.Write("Digite o número do imóvel que deseja alterar o status: ");
-    int indice = int.Parse(Console.ReadLine()) - 1;
+    Console.Write("Digite o número do imóvel que deseja alterar o status: "); //
+    int indice = int.Parse(Console.ReadLine()) - 1; // le o usuário, converte para inteiro e diminui 1 no indice, ja que acredcentei para não iniciar em zero
 
-    if (indice >= 0 && indice < imoveis.Count) {
+    if (indice >= 0 && indice < imoveis.Count) { // Verifica se exite o imóvel 
         var imovel = imoveis[indice];
         imovel.SetAlugado(!imovel.GetAlugado()); // alterna o status
-        Console.WriteLine(imovel.EstaAlugado());
+        Console.WriteLine(imovel.EstaAlugado()); // Imprimi a alteração
     }
     else {
-        Console.WriteLine("Imóvel não encontrado!");
+        Console.WriteLine("Imóvel não encontrado!"); // Imprimi mensagem de erro quando ão identifica o imóvel
     }
     Console.ReadKey();
 }
@@ -176,33 +168,73 @@ void AlterarStatusImovel()
 void CalcularValorAluguel()
 {
     Console.WriteLine("## CALCULAR ALUGUEL ##");
-    if (imoveis.Count == 0) 
+    if (imoveis.Count == 0) // verifica se há imóvel cadastrado
+    {
+        Console.WriteLine("Nenhum imóvel cadastrado.");
+        Console.ReadKey();
+        return;
+    }
+    int i = 1;
+    foreach (var imovel in imoveis)
+    {
+        Console.WriteLine($"{i++} - {imovel.GetEndereco()}, Nº {imovel.GetNumero()}"); // adiciona 1 ao indice para não iniciar em zero
+    }
+
+    Console.Write("Digite o número do imóvel: ");
+    int indice = int.Parse(Console.ReadLine()) - 1; // ver linha 155
+
+    if (indice >= 0 && indice < imoveis.Count) // Verifica se há imovel cadastrado e se indice maior que numero de imoveis cadasdtrado
+    {
+        Console.Write("Informe o valor mensal do aluguel: "); // Solicita vlor aluguel
+        int valor = int.Parse(Console.ReadLine());
+
+        Console.Write("Informe a quantidade de meses: "); // solicita numero de meses
+        int meses = int.Parse(Console.ReadLine());
+
+        int total = imoveis[indice].CalcularAluguel(valor, meses); // calcula valor aluguel x meses
+        Console.WriteLine($"Valor total do aluguel: R$ {total}"); // imprimi resultado
+    }
+    else
+    {
+        Console.WriteLine("Imóvel não encontrado!"); // mensagem de erro
+    }
+    Console.ReadKey();
+}
+
+void DeletarImovel()
+{
+    if (imoveis.Count == 0)
     {
         Console.WriteLine("Nenhum imóvel cadastrado.");
         Console.ReadKey();
         return;
     }
 
+    Console.WriteLine("## DELETAR IMÓVEL ##");
     int i = 1;
-    foreach (var imovel in imoveis) {
-        Console.WriteLine($"{i++} - {imovel.GetEndereco()}, Nº {imovel.GetNumero()}");
+    foreach (var item in imoveis)
+    {
+        Console.WriteLine($"{i++} - {item.GetEndereco()}, Nº {item.GetNumero()}");
     }
 
-    Console.Write("Digite o número do imóvel: ");
-    int indice = int.Parse(Console.ReadLine()) - 1;
+    Console.Write("Digite o número do imóvel que deseja deletar: ");
+    int indiceSelecionado = int.Parse(Console.ReadLine()) - 1; 
 
-    if (indice >= 0 && indice < imoveis.Count) {
-        Console.Write("Informe o valor mensal do aluguel: ");
-        int valor = int.Parse(Console.ReadLine());
+    if (indiceSelecionado >= 0 && indiceSelecionado < imoveis.Count) // verifica o imovel para deletar é maior que No de imoveis cadastrados
+    {
+        Imovel imovelSelecionado = imoveis[indiceSelecionado];
 
-        Console.Write("Informe a quantidade de meses: ");
-        int meses = int.Parse(Console.ReadLine());
+        // Apagar do banco
+        new DataBase().DeletarImovelDoBanco(imovelSelecionado);
 
-        int total = imoveis[indice].CalcularAluguel(valor, meses);
-        Console.WriteLine($"Valor total do aluguel: R$ {total}");
+        // Remover da lista
+        imoveis.RemoveAt(indiceSelecionado);
+
+        Console.WriteLine("Imóvel removido com sucesso!");
     }
-    else {
-        Console.WriteLine("Imóvel não encontrado!");
+    else
+    {
+        Console.WriteLine("Imóvel não encontrado!"); // mendagem de erro
     }
     Console.ReadKey();
 }
