@@ -21,6 +21,7 @@ namespace DesafioPOO.Models
     }
     public abstract class Imovel
     {
+        
         protected string Endereco;
         protected int Numero;
         protected bool Alugado;
@@ -38,7 +39,14 @@ namespace DesafioPOO.Models
         public string GetEndereco() => Endereco;
         public int GetNumero() => Numero;
         public bool GetAlugado() => Alugado;
-        public void SetAlugado(bool valor) => Alugado = valor;
+        public void SetAlugado(bool valor)
+        {
+            Alugado = valor;
+            if (Alugado)
+            {
+                Console.WriteLine("Esta muito alugado");
+            }
+        }
 
         // Cria informações sobre o proprietario para exibição depois
         public string ContatoProprietario() => $"Proprietário: {Proprietario.Nome}, Tel: {Proprietario.Telefone}";

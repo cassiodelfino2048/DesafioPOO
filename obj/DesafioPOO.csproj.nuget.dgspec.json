@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Projetos\\GFT\\Projetos\\DesafioPOO\\DesafioPOO.csproj": {}
+    "C:\\Projetos\\GitHub\\DesafioPOO\\DesafioPOO.csproj": {}
   },
   "projects": {
-    "C:\\Projetos\\GFT\\Projetos\\DesafioPOO\\DesafioPOO.csproj": {
+    "C:\\Projetos\\GitHub\\DesafioPOO\\DesafioPOO.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Projetos\\GFT\\Projetos\\DesafioPOO\\DesafioPOO.csproj",
+        "projectUniqueName": "C:\\Projetos\\GitHub\\DesafioPOO\\DesafioPOO.csproj",
         "projectName": "DesafioPOO",
-        "projectPath": "C:\\Projetos\\GFT\\Projetos\\DesafioPOO\\DesafioPOO.csproj",
-        "packagesPath": "C:\\Users\\DELL\\.nuget\\packages\\",
-        "outputPath": "C:\\Projetos\\GFT\\Projetos\\DesafioPOO\\obj\\",
+        "projectPath": "C:\\Projetos\\GitHub\\DesafioPOO\\DesafioPOO.csproj",
+        "packagesPath": "C:\\Users\\coef\\.nuget\\packages\\",
+        "outputPath": "C:\\Projetos\\GitHub\\DesafioPOO\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\DELL\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\coef\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -65,7 +65,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.303/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -11,16 +11,23 @@ List<Imovel> imoveis = new DataBase().LerImoveis(); // Le dados do bando de dado
 int opcao = -1; // Cria variável inteira, iniciada em -1, para não gerar erro.
 bool verifica = true; // variavel booleana para validar o While
 
-    while (verifica)
-    {
+while (verifica)
+{
+    try {
         Console.Clear(); // limpa a tela quando ao menu
+    }
+    catch (IOException) {
+    // Ignora o erro se o console não suportar limpar a tela
+    }
+        
         Console.WriteLine("\n ### CORRETORA iMOBILIÁRIA ### \n");
         Console.WriteLine("Escolha uma das opções abaixo: \n");
         Console.WriteLine("1 - Cadastrar Imóvel");
         Console.WriteLine("2 - Listar imóveis");
-        Console.WriteLine("3 - Alugar/Disponibilizar imóvel");
-        Console.WriteLine("4 - Calcular Aluguel");
-        Console.WriteLine("5 - Deletar Imóveis");
+        Console.WriteLine("3 - Alugar imóvel");
+        Console.WriteLine("4 - Disponibilizar Imóvel");
+        Console.WriteLine("5 - Calcular Aluguel");
+        Console.WriteLine("6 - Deletar Imóveis");
         Console.WriteLine("0 - Sair/Encerrar Programa");
         string entrada = Console.ReadLine();
 
@@ -40,11 +47,14 @@ bool verifica = true; // variavel booleana para validar o While
                 break;
         case 3:
             AlterarStatusImovel();
-                break;
-            case 4:
+            break;
+        case 4:
+            DisponibilizarImovel();
+            break;
+            case 5:
             CalcularValorAluguel();
                 break;
-            case 5:
+            case 6:
             DeletarImovel();
                 break;
             case 0:
@@ -139,30 +149,38 @@ void ListarImoveis() // Lista os imóveis
 
 void AlterarStatusImovel() // Funçao para ALUGAR ou DISPONIBILIZAR o Imóvel
 {
-    if (imoveis.Count == 0) { // verifica se existe imóveis cadastrados - evitar erro no código
+    if (imoveis.Count == 0)
+    { // verifica se existe imóveis cadastrados - evitar erro no código
         Console.WriteLine("Nenhum imóvel cadastrado.");
         Console.ReadKey(); // espera o usuário
-        return;           
+        return;
     }
 
-    Console.WriteLine("## ALUGAR / DISPONIBILIZAR IMÓVEL ##");
+    Console.WriteLine("## ALUGAR ou DISPONIBILIZAR IMÓVEL ##");
     int i = 1;
-    foreach (var imovel in imoveis) { // lista os imóveis iniciando por 1
+    foreach (var imovel in imoveis)
+    { // lista os imóveis iniciando por 1
         Console.WriteLine($"{i++} - {imovel.GetEndereco()}, Nº {imovel.GetNumero()} - {imovel.EstaAlugado()}");
     }
 
     Console.Write("Digite o número do imóvel que deseja alterar o status: "); //
     int indice = int.Parse(Console.ReadLine()) - 1; // le o usuário, converte para inteiro e diminui 1 no indice, ja que acredcentei para não iniciar em zero
 
-    if (indice >= 0 && indice < imoveis.Count) { // Verifica se exite o imóvel 
+    if (indice >= 0 && indice < imoveis.Count)
+    { // Verifica se exite o imóvel 
         var imovel = imoveis[indice];
         imovel.SetAlugado(!imovel.GetAlugado()); // alterna o status
         Console.WriteLine(imovel.EstaAlugado()); // Imprimi a alteração
     }
-    else {
+    else
+    {
         Console.WriteLine("Imóvel não encontrado!"); // Imprimi mensagem de erro quando ão identifica o imóvel
     }
     Console.ReadKey();
+}
+void DisponibilizarImovel()
+{
+    
 }
 
 void CalcularValorAluguel()
