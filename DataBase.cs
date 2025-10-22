@@ -6,6 +6,25 @@ namespace DesafioPOO.Models
     {
         private string connectionString = "server=localhost;port=3306;database=corretora;uid=root;pwd=root";
 
+        public void SalvarProprietario(Proprietario proprietario)
+        {
+            using (var conexao = new MySqlConnection(connectionString))
+            {
+                conexao.Open();
+                using (var trans = conexao.BeginTransaction())
+                {
+                    using (var cmdProp = new MySqlCommand("INSERT INTO proprietarios (nome, telefone, cpf) VALUES (@nome, @telefone, @cpf);",
+                                conexao, trans))
+                    {
+                        cmdProp.Parameters.AddWithValue("@nome", proprietario.Nome);
+                        cmdProp.Parameters.AddWithValue("@telefone", proprietario.Telefone);
+                        cmdProp.Parameters.AddWithValue("@cpf", proprietario.CPF);
+                        cmdProp.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
         public void SalvarImovel(Imovel imovel)
         {
             using (var conexao = new MySqlConnection(connectionString))
@@ -17,20 +36,19 @@ namespace DesafioPOO.Models
                     try
                     {
                         // Tentar achar proprietario existente pelo CPF
-                        long idProprietario = 0;
+                        /*long idProprietario = 0;
                         using (var cmdCheck = new MySqlCommand("SELECT id FROM proprietarios WHERE cpf = @cpf LIMIT 1;", conexao, trans))
                         {
-                            cmdCheck.Parameters.AddWithValue("@cpf", imovel.Proprietario.CPF);
+                            // cmdCheck.Parameters.AddWithValue("@cpf", imovel.Proprietario.CPF);
                             var scalar = cmdCheck.ExecuteScalar();
                             if (scalar != null && scalar != DBNull.Value)
                             {
                                 idProprietario = Convert.ToInt64(scalar);
                             }                                
-                        }
+                        }*/
 
                         // Se não existir, inserir proprietário e recuperar o id inserido
-                        if (idProprietario == 0)
-                        {
+                        
                             using (var cmdProp = new MySqlCommand("INSERT INTO proprietarios (nome, telefone, cpf) VALUES (@nome, @telefone, @cpf);",
                                 conexao, trans))
                             {
@@ -40,7 +58,7 @@ namespace DesafioPOO.Models
                                 cmdProp.ExecuteNonQuery();
 
                                 // Tenta pegar id pelo LastInsertedId do comando (funciona com MySql.Data)
-                                idProprietario = cmdProp.LastInsertedId;
+                                var idProprietario = cmdProp.LastInsertedId;
                                 if (idProprietario == 0) // fallback seguro
                                 {
                                     using (var cmdId = new MySqlCommand("SELECT LAST_INSERT_ID();", conexao, trans))
@@ -49,17 +67,11 @@ namespace DesafioPOO.Models
                                     }
                                 }
                             }
-                        }
-
-                        // Debug: escreva no console (ou log) para confirmar o id
-                        Console.WriteLine($"DEBUG: proprietario_id = {idProprietario}");
+                        
 
                         // 3) Inserir imóvel usando o id do proprietário (garante vínculo)
-                        using (var cmdImovel = new MySqlCommand(@"
-                    INSERT INTO imoveis
-                      (tipo, endereco, numero, alugado, nome_proprietario, telefone, cpf, proprietario_id)
-                    VALUES
-                      (@tipo, @endereco, @numero, @alugado, @nome, @telefone, @cpf, @propId);",
+                        using (var cmdImovel = new MySqlCommand(@"INSERT INTO imoveis(tipo, endereco, numero, alugado, nome_proprietario, telefone, 
+                        cpf, proprietario_id)VALUES (@tipo, @endereco, @numero, @alugado, @nome, @telefone, @cpf, @proprietarioId);",
                             conexao, trans))
                         {
                             cmdImovel.Parameters.AddWithValue("@tipo", imovel is Casa ? "Casa" : "Apartamento");
@@ -70,7 +82,7 @@ namespace DesafioPOO.Models
                             cmdImovel.Parameters.AddWithValue("@nome", imovel.Proprietario.Nome);
                             cmdImovel.Parameters.AddWithValue("@telefone", imovel.Proprietario.Telefone);
                             cmdImovel.Parameters.AddWithValue("@cpf", imovel.Proprietario.CPF);
-                            cmdImovel.Parameters.AddWithValue("@propId", idProprietario);
+                            cmdImovel.Parameters.AddWithValue("@proprietarioId", imovel.Proprietario.Id);
 
                             cmdImovel.ExecuteNonQuery();
                         }
@@ -108,20 +120,23 @@ namespace DesafioPOO.Models
                         string endereco = reader.GetString("endereco");
                         int numero = reader.GetInt32("numero");
                         bool alugado = reader.GetBoolean("alugado");
-                        string nome = reader.GetString("nome_proprietario");
-                        string telefone = reader.GetString("telefone");
-                        string cpf = reader.GetString("cpf");
+                        int id = reader.GetInt16("id");
+                        int proprietario_id = reader.IsDBNull(reader.GetOrdinal("proprietario_id")) ? 0 : reader.GetInt32("proprietario_id");
 
-                        var proprietario = new Proprietario(nome, telefone, cpf);
-                        Imovel imovel;
 
                         if (tipo == "casa")
-                            imovel = new Casa(endereco, numero, proprietario);
+                        {
+                            var imovel = new Casa(id, endereco, numero, proprietario_id);
+                            lista.Add(imovel);
+                        }
                         else
-                            imovel = new Apartamento(endereco, numero, proprietario);
+                        {
+                            var imovel = new Apartamento(id, endereco, numero, proprietario_id);
+                            lista.Add(imovel);
+                        }
 
-                        imovel.SetAlugado(alugado);
-                        lista.Add(imovel);
+                        // imovel.SetAlugado(alugado);
+                        // lista.Add(imovel);
                     }
                 }
             }

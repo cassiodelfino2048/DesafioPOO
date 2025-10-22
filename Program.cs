@@ -99,16 +99,17 @@ void CadastrarImovel()
     string cpf = Console.ReadLine();
 
     var proprietario = new Proprietario(nome, telefone, cpf); // Aglomera os dados do ao proprietário
+    new DataBase().SalvarProprietario(proprietario);
 
     Imovel novoImovel = null; // inicia com valor nulo
     // Direciona qual tipo de imovel
     if (tipo == "1") 
     {
-        novoImovel = new Casa(endereco, numero, proprietario);
+        novoImovel = new Casa(endereco, numero, proprietario.Id);
     }
     else if (tipo == "2")
     {
-        novoImovel = new Apartamento(endereco, numero, proprietario);
+        novoImovel = new Apartamento(endereco, numero, proprietario.Id);
     }
     else
     {
@@ -139,7 +140,7 @@ void ListarImoveis() // Lista os imóveis
     int i = 1; 
     foreach (var imovel in imoveis) // Estrutura do imóvel começando por numero 1 ao invés de zero
     {
-        Console.WriteLine($"{i++} - {imovel.GetEndereco()}, Número {imovel.GetNumero()}");
+        Console.WriteLine($"{i++} - {imovel.GetEndereco()}, Número {imovel.GetNumero()}, Id {imovel.GetId()}");
         Console.WriteLine(imovel.EstaAlugado());
         Console.WriteLine(imovel.ContatoProprietario());
         Console.WriteLine("----------------------------");
@@ -170,6 +171,7 @@ void AlterarStatusImovel() // Funçao para ALUGAR ou DISPONIBILIZAR o Imóvel
     { // Verifica se exite o imóvel 
         var imovel = imoveis[indice];
         imovel.SetAlugado(!imovel.GetAlugado()); // alterna o status
+        new DataBase().AtualizarStatus(imovel.GetId(), imovel.GetAlugado());
         Console.WriteLine(imovel.EstaAlugado()); // Imprimi a alteração
     }
     else

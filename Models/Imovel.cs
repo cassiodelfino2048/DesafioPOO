@@ -5,33 +5,33 @@ using System.Threading.Tasks;
 
 namespace DesafioPOO.Models
 {    
-    public class Proprietario // Criei a classe proprietário
-    {
-        public string Nome { get; set; }
-        public string Telefone { get; set; }
-        public string CPF { get; set; }
-
-        // Encapsulamento (Rquisito 2)
-        public Proprietario(string nome, string telefone, string cpf)
-        {
-            Nome = nome;
-            Telefone = telefone;
-            CPF = cpf;
-        }
-    }
+    
     public abstract class Imovel
     {
         
         protected string Endereco;
         protected int Numero;
         protected bool Alugado;
+        protected int Id;
+        protected int Proprietario_id;
         public Proprietario Proprietario { get; protected set; }
 
-        public Imovel(string endereco, int numero, Proprietario proprietario)
+
+
+        public Imovel(int id, string endereco, int numero, int proprietario_id)
         {
+            Id = id;
+            Proprietario_id = proprietario_id;
             Endereco = endereco;
             Numero = numero;
-            Proprietario = proprietario;
+            Alugado = false;
+        }
+        public Imovel(string endereco, int numero, int proprietario_id)
+        {
+            Id = 0;
+            Proprietario_id = proprietario_id;
+            Endereco = endereco;
+            Numero = numero;            
             Alugado = false;
         }
 
@@ -39,6 +39,7 @@ namespace DesafioPOO.Models
         public string GetEndereco() => Endereco;
         public int GetNumero() => Numero;
         public bool GetAlugado() => Alugado;
+        public int GetId() => Id;
         public void SetAlugado(bool valor)
         {
             Alugado = valor;
